@@ -100,6 +100,9 @@ func (p *pgTx) Job() Job {
 
 func (p *pgTx) Update(ctx context.Context, id string, attempt int32, lastError string, nextRunAt int64) error {
 	query := "UPDATE bgjob_job SET attempt = $1, last_error = $2, next_run_at = $3, updated_at = $4 WHERE id = $5"
+	if len(lastError) > 0 {
+		lastError = "<" + timeNow().Format("2006-01-02 15:04:05") + "> " + lastError
+	}
 	_, err := p.tx.ExecContext(ctx, query, attempt, lastError, nextRunAt, timeNow(), id)
 	return err
 }
